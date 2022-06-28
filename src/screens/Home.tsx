@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     FlatList,
@@ -26,14 +26,27 @@ const STORIES_QUERY = gql`
 `;
 
 const Home: FC = () => {
-    const [{ data, error, fetching }] = useQuery<
+    const [{ data, error, fetching }, refreshStories] = useQuery<
         AllStoriesQuery,
         AllStoriesQueryVariables
     >({
         query: STORIES_QUERY,
     });
 
-    if (fetching) {
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    const handleRefreshStories = useCallback(() => {
+        setIsRefreshing(true);
+        refreshStories({ requestPolicy: 'network-only' });
+    }, [refreshStories]);
+
+    useEffect(() => {
+        if (!fetching) {
+            setIsRefreshing(false);
+        }
+    }, [fetching]);
+
+    if (fetching && !isRefreshing) {
         return (
             <View style={styles.container}>
                 <ActivityIndicator color="gray" />
@@ -52,6 +65,8 @@ const Home: FC = () => {
 
     return (
         <FlatList
+            refreshing={isRefreshing}
+            onRefresh={handleRefreshStories}
             contentContainerStyle={styles.flatListContainer}
             data={data?.stories}
             keyExtractor={item => item.id}

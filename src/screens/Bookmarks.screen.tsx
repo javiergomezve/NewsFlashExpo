@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     FlatList,
@@ -29,14 +29,27 @@ const BOOKMARKS_QUERY = gql`
 `;
 
 const BookmarksScreen: FC = () => {
-    const [{ data, error, fetching }] = useQuery<
+    const [{ data, error, fetching }, refreshBookmarks] = useQuery<
         AllBookmarksQuery,
         AllBookmarksQueryVariables
     >({
         query: BOOKMARKS_QUERY,
     });
 
-    if (fetching) {
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    const handleRefreshBookmarks = useCallback(() => {
+        setIsRefreshing(true);
+        refreshBookmarks({ requestPolicy: 'network-only' });
+    }, [refreshBookmarks]);
+
+    useEffect(() => {
+        if (!fetching) {
+            setIsRefreshing(false);
+        }
+    }, [fetching]);
+
+    if (fetching && !isRefreshing) {
         return (
             <View style={styles.container}>
                 <ActivityIndicator color="gray" />
@@ -55,6 +68,8 @@ const BookmarksScreen: FC = () => {
 
     return (
         <FlatList
+            refreshing={isRefreshing}
+            onRefresh={handleRefreshBookmarks}
             contentContainerStyle={styles.flatListContainer}
             data={data?.bookmarks}
             keyExtractor={item => item.id}
