@@ -1,0 +1,6 @@
+schema: https://9228-190-67-220-99.ngrok.io/graphql
+overwrite: true
+generates:
+  ./src/graphql/graphql.schema.json:
+    plugins:
+      - introspection

@@ -12,6 +12,10 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { gql, useQuery } from 'urql';
 
 import { RootStackParamList } from '../types';
+import {
+    AllStoriesQuery,
+    AllStoriesQueryVariables,
+} from '../graphql/__generated__/operationTypes';
 
 const STORIES_QUERY = gql`
     query AllStories {
@@ -28,7 +32,10 @@ const Home: FC = () => {
     const navigation =
         useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-    const [{ data, error, fetching }] = useQuery({
+    const [{ data, error, fetching }] = useQuery<
+        AllStoriesQuery,
+        AllStoriesQueryVariables
+    >({
         query: STORIES_QUERY,
     });
 
@@ -52,7 +59,7 @@ const Home: FC = () => {
     return (
         <FlatList
             contentContainerStyle={styles.flatListContainer}
-            data={data.stories}
+            data={data?.stories}
             keyExtractor={item => item.id}
             ItemSeparatorComponent={() => <View style={styles.separator} />}
             renderItem={({ item }) => (
