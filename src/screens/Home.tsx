@@ -1,37 +1,31 @@
-import { FC } from 'react';
+import React, { FC } from 'react';
 import {
     ActivityIndicator,
     FlatList,
     StyleSheet,
     Text,
     View,
-    Pressable,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { gql, useQuery } from 'urql';
 
-import { RootStackParamList } from '../types';
 import {
     AllStoriesQuery,
     AllStoriesQueryVariables,
 } from '../graphql/__generated__/operationTypes';
+import { StorySummaryFields } from '../graphql/fragments';
+import Story from '../components/Story';
 
 const STORIES_QUERY = gql`
     query AllStories {
         stories {
-            id
-            title
-            author
-            summary
+            ...StorySummaryFields
         }
     }
+
+    ${StorySummaryFields}
 `;
 
 const Home: FC = () => {
-    const navigation =
-        useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-
     const [{ data, error, fetching }] = useQuery<
         AllStoriesQuery,
         AllStoriesQueryVariables
@@ -62,19 +56,7 @@ const Home: FC = () => {
             data={data?.stories}
             keyExtractor={item => item.id}
             ItemSeparatorComponent={() => <View style={styles.separator} />}
-            renderItem={({ item }) => (
-                <Pressable
-                    onPress={() =>
-                        navigation.navigate('StoryDetailsModal', {
-                            id: item.id,
-                            title: item.title,
-                        })
-                    }
-                >
-                    <Text style={styles.title}>{item.title}</Text>
-                    <Text style={styles.summary}>{item.summary}</Text>
-                </Pressable>
-            )}
+            renderItem={({ item }) => <Story item={item} />}
             style={styles.flatList}
         />
     );
@@ -94,17 +76,6 @@ const styles = StyleSheet.create({
     },
     flatList: {
         paddingHorizontal: 20,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: '400',
-        textTransform: 'uppercase',
-        letterSpacing: 2,
-        marginBottom: 10,
-    },
-    summary: {
-        fontSize: 18,
-        color: 'grey',
     },
     separator: {
         height: 1,
