@@ -1,20 +1,18 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { FC } from 'react';
+import { createClient, Provider as UrqlProvider } from 'urql';
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+import Stories from './Stories';
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+const client = createClient({
+    url: 'https://9228-190-67-220-99.ngrok.io/graphql',
 });
+
+const App: FC = () => {
+    return (
+        <UrqlProvider value={client}>
+            <Stories />
+        </UrqlProvider>
+    );
+};
+
+export default App;
