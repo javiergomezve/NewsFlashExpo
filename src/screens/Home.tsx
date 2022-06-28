@@ -6,7 +6,6 @@ import {
     Text,
     View,
 } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import { gql, useQuery } from 'urql';
 
 const STORIES_QUERY = gql`
@@ -20,7 +19,7 @@ const STORIES_QUERY = gql`
     }
 `;
 
-const Stories: FC = () => {
+const Home: FC = () => {
     const [{ data, error, fetching }] = useQuery({
         query: STORIES_QUERY,
     });
@@ -59,7 +58,7 @@ const Stories: FC = () => {
     );
 };
 
-export default Stories;
+export default Home;
 
 const styles = StyleSheet.create({
     container: {
@@ -69,8 +68,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     flatListContainer: {
-        paddingTop: 100,
-        paddingBottom: 20,
+        paddingVertical: 20,
     },
     flatList: {
         paddingHorizontal: 20,
